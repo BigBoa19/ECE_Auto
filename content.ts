@@ -289,23 +289,17 @@ async function handleResolveTickets(recipientName: string): Promise<ResolveTicke
 
   console.log(`[content] Resolving ${matchingItems.length} ticket(s) inline...`)
 
-  for (let i = 0; i < matchingItems.length; i++) {
-    const item = matchingItems[i]
+  for (const item of matchingItems) {
     const statusSelect = item.querySelector<HTMLSelectElement>('select[name="Status"]')
-    if (!statusSelect) {
-      console.log(`[resolve ${i}] no Status select found, skipping`)
-      continue
-    }
+    if (!statusSelect) continue
 
     const td = statusSelect.closest<HTMLElement>("td")
     const editIcon = td?.querySelector<Element>(".value .edit-icon")
-    console.log(`[resolve ${i}] editIcon found:`, !!editIcon)
     if (editIcon) editIcon.dispatchEvent(new MouseEvent("click", { bubbles: true }))
     await new Promise(r => setTimeout(r, 300))
 
     statusSelect.value = "resolved"
     statusSelect.dispatchEvent(new Event("change", { bubbles: true }))
-    console.log(`[resolve ${i}] value set to:`, statusSelect.value)
 
     const bsContainer = statusSelect.closest(".bootstrap-select")
     if (bsContainer) {
@@ -315,7 +309,6 @@ async function handleResolveTickets(recipientName: string): Promise<ResolveTicke
 
     const form = statusSelect.closest<HTMLFormElement>("form.editor")
     const submitBtn = form?.querySelector<Element>(".submit.text-success")
-    console.log(`[resolve ${i}] submitBtn found:`, !!submitBtn)
     if (submitBtn) submitBtn.dispatchEvent(new MouseEvent("click", { bubbles: true }))
 
     await new Promise(r => setTimeout(r, 500))
