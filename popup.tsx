@@ -30,17 +30,15 @@ function IndexPopup() {
   }, [])
 
   const handleStartNew = () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0]?.id) {
-        const tabId = tabs[0].id
-        chrome.tabs.update(tabId, { url: RT_LIST_FULL })
-        chrome.tabs.onUpdated.addListener(function listener(id, info) {
-          if (id === tabId && info.status === "complete") {
-            chrome.tabs.onUpdated.removeListener(listener)
-            setOnCorrectPage(true)
-          }
-        })
-      }
+    chrome.tabs.create({ url: RT_LIST_FULL }, (tab) => {
+      if (!tab?.id) return
+      const tabId = tab.id
+      chrome.tabs.onUpdated.addListener(function listener(id, info) {
+        if (id === tabId && info.status === "complete") {
+          chrome.tabs.onUpdated.removeListener(listener)
+          setOnCorrectPage(true)
+        }
+      })
     })
   }
 
