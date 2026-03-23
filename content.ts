@@ -5,6 +5,7 @@ import type {
   LookupEmailResponse,
   MessageToContent,
   PendingTicket,
+  ResolveTicketsResponse,
   TicketPayload
 } from "~types"
 
@@ -270,10 +271,67 @@ async function handleCreateTicket(payload: TicketPayload): Promise<CreateTicketR
   return { success: true }
 }
 
+async function handleResolveTickets(recipientName: string): Promise<ResolveTicketsResponse> {
+  console.log("[content] RESOLVE_TICKETS received:", recipientName)
+
+  const items = document.querySelectorAll("tbody.list-item")
+  const lowerName = recipientName.toLowerCase()
+  const matchingItems: Element[] = []
+
+  for (const item of items) {
+    const text = item.textContent?.toLowerCase() ?? ""
+    if (text.includes(lowerName)) matchingItems.push(item)
+  }
+
+  if (matchingItems.length === 0) {
+    return { success: false, error: `No open tickets found for "${recipientName}"` }
+  }
+
+  console.log(`[content] Resolving ${matchingItems.length} ticket(s) inline...`)
+
+  for (let i = 0; i < matchingItems.length; i++) {
+    const item = matchingItems[i]
+    const statusSelect = item.querySelector<HTMLSelectElement>('select[name="Status"]')
+    if (!statusSelect) {
+      console.log(`[resolve ${i}] no Status select found, skipping`)
+      continue
+    }
+
+    const td = statusSelect.closest<HTMLElement>("td")
+    const editIcon = td?.querySelector<Element>(".value .edit-icon")
+    console.log(`[resolve ${i}] editIcon found:`, !!editIcon)
+    if (editIcon) editIcon.dispatchEvent(new MouseEvent("click", { bubbles: true }))
+    await new Promise(r => setTimeout(r, 300))
+
+    statusSelect.value = "resolved"
+    statusSelect.dispatchEvent(new Event("change", { bubbles: true }))
+    console.log(`[resolve ${i}] value set to:`, statusSelect.value)
+
+    const bsContainer = statusSelect.closest(".bootstrap-select")
+    if (bsContainer) {
+      const displayEl = bsContainer.querySelector(".filter-option-inner-inner")
+      if (displayEl) displayEl.textContent = "resolved"
+    }
+
+    const form = statusSelect.closest<HTMLFormElement>("form.editor")
+    const submitBtn = form?.querySelector<Element>(".submit.text-success")
+    console.log(`[resolve ${i}] submitBtn found:`, !!submitBtn)
+    if (submitBtn) submitBtn.dispatchEvent(new MouseEvent("click", { bubbles: true }))
+
+    await new Promise(r => setTimeout(r, 500))
+  }
+
+  return { success: true, count: matchingItems.length }
+}
+
 chrome.runtime.onMessage.addListener(
-  (message: MessageToContent, _sender, sendResponse: (r: CreateTicketResponse) => void) => {
+  (message: MessageToContent, _sender, sendResponse: (r: CreateTicketResponse | ResolveTicketsResponse) => void) => {
     if (message.type === "CREATE_TICKET") {
       handleCreateTicket(message.payload).then(sendResponse)
+      return true
+    }
+    if (message.type === "RESOLVE_TICKETS") {
+      handleResolveTickets(message.recipientName).then(sendResponse)
       return true
     }
   }

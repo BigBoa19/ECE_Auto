@@ -189,6 +189,23 @@ body {
   background: var(--green-hover);
 }
 
+.btn-secondary {
+  background: var(--orange-light);
+  color: var(--orange);
+  border: 1.5px solid var(--orange);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--orange);
+  color: #fff;
+}
+
+.btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .full-width {
   width: 100%;
 }

@@ -13,13 +13,18 @@ export interface CreateTicketMessage {
   payload: TicketPayload
 }
 
+export interface ResolveTicketsMessage {
+  type: "RESOLVE_TICKETS"
+  recipientName: string
+}
+
 // Content Script → Background
 export interface LookupEmailMessage {
   type: "LOOKUP_EMAIL"
   name: string
 }
 
-export type MessageToContent = CreateTicketMessage
+export type MessageToContent = CreateTicketMessage | ResolveTicketsMessage
 export type MessageToBackground = LookupEmailMessage
 
 export interface LookupEmailResponse {
@@ -33,6 +38,12 @@ export interface CreateTicketResponse {
   error?: string
 }
 
+export interface ResolveTicketsResponse {
+  success: boolean
+  count?: number
+  error?: string
+}
+
 export interface PendingTicket {
   recipientName: string
   carrier: Carrier
@@ -40,3 +51,4 @@ export interface PendingTicket {
   quantity: number
   email: string
 }
+
