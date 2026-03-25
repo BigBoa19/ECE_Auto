@@ -1,4 +1,4 @@
-export type Carrier = "FedEx" | "UPS" | "Amazon" | "USPS"
+export type Carrier = "FedEx" | "UPS" | "Amazon" | "USPS" | "DHL"
 
 export interface TicketPayload {
   recipientName: string

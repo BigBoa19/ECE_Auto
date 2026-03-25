@@ -19,7 +19,7 @@ const RT_LIST_OPEN =
   `${RT_LIST_URL}?Query=${encodeURIComponent("Queue = 'receiving' AND Status = 'open'")}` +
   `&OrderBy=Created&Order=DESC&RowsPerPage=0`
 
-const CARRIERS: Carrier[] = ["FedEx", "UPS", "Amazon", "USPS"]
+const CARRIERS: Carrier[] = ["FedEx", "UPS", "Amazon", "USPS", "DHL"]
 
 type PageMode = "loading" | "new-list" | "open-list" | "other"
 
