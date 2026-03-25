@@ -134,6 +134,19 @@ function IndexPopup() {
     }
   }
 
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Enter" || status === "working") return
+      if (pageMode === "new-list" && recipientName.trim()) {
+        handleSubmit()
+      } else if (pageMode === "open-list" && recipientName.trim()) {
+        handleResolveSubmit()
+      }
+    }
+    window.addEventListener("keydown", onKeyDown)
+    return () => window.removeEventListener("keydown", onKeyDown)
+  }, [pageMode, recipientName, status, carrier, vendor, quantity])
+
   const header = (
     <div className="header">
       <span className="header-dot" />
